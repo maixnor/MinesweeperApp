@@ -1,6 +1,7 @@
 package at.spengergasse.minesweeper;
 
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -117,10 +119,51 @@ public class MainActivity extends AppCompatActivity {
         // could be inlined, but for readability it is separated
         // migrated string selection to game class, can later be translated to paths
         String[] strings = game.getAllStringsOfAllCells();
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, strings);
         // set adapter with new data in it
         gridView.setAdapter(adapter);
     }
+
+    private ImageView getImage(String field) {
+        ImageView image = new ImageView(this);
+        image.setScaleType(ImageView.ScaleType.CENTER);
+        switch (field) {
+            case "1":
+                image.setImageResource(R.drawable.icon1);
+                break;
+            case "2":
+                image.setImageResource(R.drawable.icon2);
+                break;
+            case "3":
+                image.setImageResource(R.drawable.icon3);
+                break;
+            case "4":
+                image.setImageResource(R.drawable.icon4);
+                break;
+            case "5":
+                image.setImageResource(R.drawable.icon5);
+                break;
+            case "6":
+                image.setImageResource(R.drawable.icon6);
+                break;
+            case "7":
+                image.setImageResource(R.drawable.icon7);
+                break;
+            case "8":
+                image.setImageResource(R.drawable.icon8);
+                break;
+            case " ":
+                image.setImageResource(R.drawable.empty);
+            case "X": // hidden
+                image.setImageResource(R.drawable.hidden);
+            case "F": // flagged
+                image.setImageResource(R.drawable.flag);
+        }
+        return new ImageView(this);
+    }
+
+
 
     private void increaseScore(int score) {
         // count up the score | heavily inlined
