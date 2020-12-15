@@ -1,7 +1,6 @@
 package at.spengergasse.minesweeper;
 
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.View;
@@ -15,7 +14,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.Preference;
 import androidx.preference.PreferenceManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,18 +32,18 @@ public class MainActivity extends AppCompatActivity {
         // get vars from settings
         PreferenceManager.setDefaultValues(this, R.xml.root_preferences, false);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int cols = sharedPreferences.getInt("default_columns", 6);
-        int rows = sharedPreferences.getInt("default_rows", 6);
-        int bombs = sharedPreferences.getInt("default_bombs", 6);
+        int cols = Integer.parseInt(sharedPreferences.getString("default_columns", "6"));
+        int rows = Integer.parseInt(sharedPreferences.getString("default_rows", "6"));
+        int bombs = Integer.parseInt(sharedPreferences.getString("default_bombs", "6"));
         // override defaults when necessary
         Editable s_cols = this.<EditText>findViewById(R.id.cols).getText();
-        if (s_cols != null)
+        if (!s_cols.toString().equals(""))
             cols = Integer.parseInt(s_cols.toString());
         Editable s_rows = this.<EditText>findViewById(R.id.rows).getText();
-        if (s_rows != null)
+        if (!s_rows.toString().equals(""))
             cols = Integer.parseInt(s_rows.toString());
         Editable s_bombs = this.<EditText>findViewById(R.id.bombs).getText();
-        if (s_bombs != null)
+        if (!s_bombs.toString().equals(""))
             cols = Integer.parseInt(s_bombs.toString());
         // init game
         game = new Game(cols, rows, bombs);
@@ -67,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                         loseGame();
                         break;
                     case VALID:
-                        renderBoard();
+                        renderBoardImages();
                         score = 20;
                         break;
                     case INVALID:
@@ -94,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                         loseGame();
                         break;
                     case VALID:
-                        renderBoard();
+                        renderBoardImages();
                         score = 50;
                         break;
                     case INVALID:
@@ -109,25 +107,44 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         // render board for the first time
-        renderBoard();
+        renderBoardImages();
     }
 
-    private void renderBoard() {
+    private void renderBoardImages() {
+        // get GridView
+        GridView gridView = findViewById(R.id.game_grid);
+        // put data into custom ImageAdapter
+        String[] strings = game.getAllStringsOfAllCells();
+        // convert to images
+        ImageView[] images = new ImageView[strings.length];
+        for (int i = 0; i < images.length; i++) {
+            images[i] = getImage(strings[i]);
+        }
+        // set adapter with new images in it
+        ImageAdapter adapter = new ImageAdapter(images);
+        gridView.setAdapter(adapter);
+    }
+
+    private void renderBoardStrings() { // legacy
         // get GridView
         GridView gridView = findViewById(R.id.game_grid);
         // put data into ArrayAdapter
         // could be inlined, but for readability it is separated
-        // migrated string selection to game class, can later be translated to paths
+        // migrated string selection to game class, to make activity simpler
         String[] strings = game.getAllStringsOfAllCells();
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, strings);
-        // set adapter with new data in it
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                strings);
+        // set adapter with new strings in it
         gridView.setAdapter(adapter);
+
     }
 
     private ImageView getImage(String field) {
         ImageView image = new ImageView(this);
         image.setScaleType(ImageView.ScaleType.CENTER);
+        image.setBackgroundColor(255255255);
         switch (field) {
             case "1":
                 image.setImageResource(R.drawable.icon1);
@@ -154,16 +171,15 @@ public class MainActivity extends AppCompatActivity {
                 image.setImageResource(R.drawable.icon8);
                 break;
             case " ":
+            case "":
                 image.setImageResource(R.drawable.empty);
             case "X": // hidden
                 image.setImageResource(R.drawable.hidden);
             case "F": // flagged
                 image.setImageResource(R.drawable.flag);
         }
-        return new ImageView(this);
+        return image;
     }
-
-
 
     private void increaseScore(int score) {
         // count up the score | heavily inlined
@@ -172,13 +188,13 @@ public class MainActivity extends AppCompatActivity {
 
     private void loseGame() {
         game.uncoverAll(); // to see the mistakes
-        renderBoard();
+        renderBoardImages();
         Toast.makeText(this, R.string.lose, Toast.LENGTH_LONG).show();
     }
 
     private void winGame() {
         game.uncoverAll(); // to uncover bombs too
-        renderBoard();
+        renderBoardImages();
         Toast.makeText(this, R.string.win, Toast.LENGTH_LONG).show();
     }
 
@@ -188,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void restart(View view) {
         game.restart();
-        renderBoard();
+        renderBoardImages();
         // set score to 0
         TextView score = findViewById(R.id.score);
         score.setText("0");
