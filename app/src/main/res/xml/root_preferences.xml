@@ -1,0 +1,48 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="Default Values">
+
+        <ListPreference
+            app:key="difficulty"
+            app:defaultValue="baby"
+            app:title="Difficulty"
+            >
+        </ListPreference>
+
+        <EditTextPreference
+            app:key="default_columns"
+            app:title="Columns"
+            app:defaultValue="6"
+            app:summary="The default Column Size"/>
+
+        <EditTextPreference
+            app:key="default_rows"
+            app:title="Rows"
+            app:defaultValue="6"
+            app:summary="The default Row Size"/>
+
+        <EditTextPreference
+            app:key="default_bombs"
+            app:title="Bombs"
+            app:defaultValue="6"
+            app:summary="The default Bomb count"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Controls">
+
+        <SwitchPreferenceCompat
+            app:key="switch"
+            app:title="Switch Controls"
+            app:summary="Switches Click and Long Click"/>
+
+        <SwitchPreferenceCompat
+            app:key="toggle"
+            app:title="Toggle"
+            app:summary="Enable Toggle mode for faster gameplay."/>
+
+
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
