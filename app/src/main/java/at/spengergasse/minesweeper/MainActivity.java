@@ -16,37 +16,23 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 
+import static at.spengergasse.minesweeper.R.string.good_luck;
+
 public class MainActivity extends AppCompatActivity {
 
     public Game game;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         requestWindowFeature(Window.FEATURE_ACTION_BAR);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
     }
 
     public void startGame(View view) {
-        // get vars from settings
-        PreferenceManager.setDefaultValues(this, R.xml.root_preferences, false);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        int cols = Integer.parseInt(sharedPreferences.getString("default_columns", "6"));
-        int rows = Integer.parseInt(sharedPreferences.getString("default_rows", "6"));
-        int bombs = Integer.parseInt(sharedPreferences.getString("default_bombs", "6"));
-        // override defaults when necessary
-        Editable s_cols = this.<EditText>findViewById(R.id.cols).getText();
-        if (!s_cols.toString().equals(""))
-            cols = Integer.parseInt(s_cols.toString());
-        Editable s_rows = this.<EditText>findViewById(R.id.rows).getText();
-        if (!s_rows.toString().equals(""))
-            cols = Integer.parseInt(s_rows.toString());
-        Editable s_bombs = this.<EditText>findViewById(R.id.bombs).getText();
-        if (!s_bombs.toString().equals(""))
-            cols = Integer.parseInt(s_bombs.toString());
-        // init game
-        game = new Game(cols, rows, bombs);
+        // initialize Game and return number of columns for AdapterView
+        int cols = initializeGame();
         // switch to game activity, otherwise null pointer
         setContentView(R.layout.acitvity_game);
         // add listeners to gridView
@@ -56,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int score = 0;
-                switch (game.flag(position)) {
+                Game.Result result = Boolean.parseBoolean(sharedPreferences.getString("switch", "false")) ? game.flag(position) : game.uncover(position);
+                switch (result) {
                     case WIN:
                         winGame();
                         score = 150;
@@ -83,7 +70,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 int score = 0;
-                switch (game.uncover(position)) {
+                Game.Result result = Boolean.parseBoolean(sharedPreferences.getString("switch", "false")) ? game.uncover(position) : game.flag(position);
+                switch (result) {
                     case WIN:
                         winGame();
                         score = 150;
@@ -108,6 +96,29 @@ public class MainActivity extends AppCompatActivity {
         });
         // render board for the first time
         renderBoardImages();
+        Toast.makeText(this, good_luck, Toast.LENGTH_SHORT).show();
+    }
+
+    private int initializeGame() {
+        // get vars from settings
+        PreferenceManager.setDefaultValues(this, R.xml.root_preferences, false);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int cols = Integer.parseInt(sharedPreferences.getString("default_columns", "6"));
+        int rows = Integer.parseInt(sharedPreferences.getString("default_rows", "6"));
+        int bombs = Integer.parseInt(sharedPreferences.getString("default_bombs", "6"));
+        // override defaults when necessary
+        Editable s_cols = this.<EditText>findViewById(R.id.cols).getText();
+        if (!s_cols.toString().equals(""))
+            cols = Integer.parseInt(s_cols.toString());
+        Editable s_rows = this.<EditText>findViewById(R.id.rows).getText();
+        if (!s_rows.toString().equals(""))
+            cols = Integer.parseInt(s_rows.toString());
+        Editable s_bombs = this.<EditText>findViewById(R.id.bombs).getText();
+        if (!s_bombs.toString().equals(""))
+            cols = Integer.parseInt(s_bombs.toString());
+        // init game
+        game = new Game(cols, rows, bombs);
+        return cols;
     }
 
     private void renderBoardImages() {
@@ -125,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         gridView.setAdapter(adapter);
     }
 
-    private void renderBoardStrings() { // legacy
+    private void renderBoardStrings() { // legacy and not used
         // get GridView
         GridView gridView = findViewById(R.id.game_grid);
         // put data into ArrayAdapter
@@ -170,13 +181,19 @@ public class MainActivity extends AppCompatActivity {
             case "8":
                 image.setImageResource(R.drawable.icon8);
                 break;
-            case " ":
+            case " ": // empty
             case "":
                 image.setImageResource(R.drawable.empty);
+                break;
             case "X": // hidden
                 image.setImageResource(R.drawable.hidden);
+                break;
             case "F": // flagged
                 image.setImageResource(R.drawable.flag);
+                break;
+            case "B": // bomb
+                image.setImageResource(R.drawable.bomb);
+                break;
         }
         return image;
     }
@@ -187,7 +204,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loseGame() {
-        game.uncoverAll(); // to see the mistakes
         renderBoardImages();
         Toast.makeText(this, R.string.lose, Toast.LENGTH_LONG).show();
     }

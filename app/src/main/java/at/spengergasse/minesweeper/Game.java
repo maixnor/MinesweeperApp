@@ -39,12 +39,14 @@ public class Game {
 	private int cols, rows;
 
 	public String[] getAllStringsOfAllCells() {
-		String[] grid = new String[rows*cols];
-		for (int row = 0; row < rows; row++) {
-			for (int column = 0; column < cols; column++) {
-				grid[cols*row + column] = getStringOfCell(column, row);
+		String[] grid = new String[rows * cols];
+
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
+				grid[cols * i + j] = getStringOfCell(j, i);
 			}
-		} // end of loops
+		}
+
 		return grid;
 	}
 
@@ -136,11 +138,11 @@ public class Game {
 	}
 
 	public Result uncover (int absolute) {
-		return uncover(absolute / rows, absolute % rows);
+		return uncover(absolute % rows, absolute / rows);
 	}
 
 	public Result flag(int absolute) {
-		return flag(absolute / rows, absolute % rows);
+		return flag(absolute % rows, absolute / rows);
 	}
 
 	private Result uncover(int x, int y)

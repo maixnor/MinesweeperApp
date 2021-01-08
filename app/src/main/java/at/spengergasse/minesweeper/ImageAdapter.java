@@ -9,6 +9,10 @@ public class ImageAdapter extends BaseAdapter {
 
     ImageView[] images;
 
+    public ImageAdapter(ImageView[] images) {
+        this.images = images;
+    }
+
     @Override
     public int getCount() {
         return images.length;
@@ -16,21 +20,17 @@ public class ImageAdapter extends BaseAdapter {
 
     @Override
     public Object getItem(int position) {
-        return images[position];
+        return null;
     }
 
     @Override
     public long getItemId(int position) {
-        return images[position].getId();
+        return 0;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         return images[position];
-    }
-
-    public ImageAdapter(ImageView[] images) {
-        this.images = images;
     }
 
 }

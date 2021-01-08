@@ -36,13 +36,6 @@
             app:title="Switch Controls"
             app:summary="Switches Click and Long Click"/>
 
-        <SwitchPreferenceCompat
-            app:key="toggle"
-            app:title="Toggle"
-            app:summary="Enable Toggle mode for faster gameplay."/>
-
-
-
     </PreferenceCategory>
 
 </PreferenceScreen>
