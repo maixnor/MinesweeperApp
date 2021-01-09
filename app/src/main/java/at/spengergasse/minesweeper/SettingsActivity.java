@@ -10,7 +10,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.settings_container, new SettingsFragment())
+                //.replace(R.id.settings_container, new SettingsFragment())
                 .commit();
     }
 }

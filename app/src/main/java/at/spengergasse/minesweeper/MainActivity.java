@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 int score = 0;
-                Game.Result result = Boolean.parseBoolean(sharedPreferences.getString("switch", "false")) ? game.flag(position) : game.uncover(position);
+                Game.Result result = Boolean.parseBoolean(sharedPreferences.getString("switch", "false")) ? game.uncover(position) : game.flag(position);
                 switch (result) {
                     case WIN:
                         winGame();
@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 int score = 0;
-                Game.Result result = Boolean.parseBoolean(sharedPreferences.getString("switch", "false")) ? game.uncover(position) : game.flag(position);
+                Game.Result result = Boolean.parseBoolean(sharedPreferences.getString("switch", "false")) ? game.flag(position) : game.uncover(position);
                 switch (result) {
                     case WIN:
                         winGame();
